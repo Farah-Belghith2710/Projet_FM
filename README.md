@@ -1,7 +1,7 @@
 # Étude comparative de pronostic de défaillance de roulements
 
 **Module :** Sûreté de fonctionnement et maintenance · **Encadrant :** M. Fayçal Ben Hmida · ENSIT, GMAM 3
-**Équipe :** Farah BELGHITH,Rami Kammoun, Selim Najjar
+**Équipe :** Farah Belghith, Rami Kammoun, Selim Najjar
 **Données :** FEMTO-ST / PRONOSTIA, challenge IEEE PHM 2012 (17 roulements, 3 conditions opératoires)
 **Livrables :** pipeline Python en 4 sprints, 23 figures, dashboard interactif en 7 pages (Streamlit)
 
@@ -12,7 +12,7 @@
 ## 1. Lancer le dashboard (2 minutes)
 
 Les résultats sont **déjà calculés** (dossier `results/`). Il suffit de Python et de 4 bibliothèques.
-Dans VS Code : *Fichier → Ouvrir le dossier* (`projet_FM_bearings`), puis *Terminal → Nouveau terminal* :
+Dans VS Code : *Fichier → Ouvrir le dossier* (`Projet_FM`), puis *Terminal → Nouveau terminal* :
 
 ```bash
 pip install streamlit plotly pandas numpy
