@@ -1,0 +1,179 @@
+\chapter{Méthodologie de A à Z}
+
+\chapintro
+Ce chapitre décrit toute la chaîne de traitement, du fichier de vibration à la décision de maintenance. Pour chaque étape, nous expliquons la méthode simplement, puis pourquoi nous l'avons choisie.
+
+\section{Vue d'ensemble de la démarche}
+
+La figure~\ref{fig:pipeline} résume la démarche, et le tableau~\ref{tab:sprints} indique ce que chaque sprint a produit. Les 6 roulements d'apprentissage servent à construire et régler tout ce qui doit l'être ; les 11 roulements de test ne servent qu'à juger.
+
+\begin{figure}[H]
+\centering
+\definecolor{s1}{RGB}{23,86,110}\definecolor{s2}{RGB}{31,94,67}\definecolor{s3}{RGB}{138,79,7}\definecolor{s4}{RGB}{79,51,117}
+\begin{tikzpicture}[font=\small,
+  bloc/.style={draw=#1,fill=#1!10,rounded corners=4pt,line width=0.9pt,minimum width=2.55cm,minimum height=1.15cm,
+               align=center,text width=2.45cm},
+  fleche/.style={-{Stealth[length=2.2mm]},line width=0.8pt,color=black!60}]
+  \node[bloc=s1] (a) {24 889 fichiers\\de vibration};
+  \node[bloc=s1,right=0.55cm of a] (b) {Contrôle qualité\\et filtrage};
+  \node[bloc=s1,right=0.55cm of b] (c) {Fiabilité :\\Weibull, B10, B50};
+  \node[bloc=s2,right=0.55cm of c] (d) {36 features\\normalisées};
+  \node[bloc=s2,below=0.75cm of d] (e) {Premier défaut\\(règle des 3 $\sigma$)};
+  \node[bloc=s2,left=0.55cm of e] (f) {Indicateur\\de santé (HI)};
+  \node[bloc=s3,left=0.55cm of f] (g) {7 méthodes\\de RUL};
+  \node[bloc=s4,left=0.55cm of g] (h) {Évaluation,\\tests, XAI};
+  \node[bloc=s4,below=0.75cm of h,text width=5.6cm,minimum width=5.7cm] (i) {Décision de maintenance\\et analyse économique};
+  \draw[fleche] (a) -- (b); \draw[fleche] (b) -- (c); \draw[fleche] (c) -- (d);
+  \draw[fleche] (d) -- (e); \draw[fleche] (e) -- (f); \draw[fleche] (f) -- (g); \draw[fleche] (g) -- (h);
+  \draw[fleche] (h) -- (h|-i.north);
+  \node[anchor=west,font=\footnotesize,text=s1] at ($(i.east)+(0.5,0.25)$) {\textbf{Sprint 1} données};
+  \node[anchor=west,font=\footnotesize,text=s2] at ($(i.east)+(3.0,0.25)$) {\textbf{Sprint 2} santé};
+  \node[anchor=west,font=\footnotesize,text=s3] at ($(i.east)+(0.5,-0.25)$) {\textbf{Sprint 3} modèles};
+  \node[anchor=west,font=\footnotesize,text=s4] at ($(i.east)+(3.0,-0.25)$) {\textbf{Sprint 4} évaluation};
+\end{tikzpicture}
+\caption[La démarche complète, du signal à la décision]{La démarche complète, du signal brut à la décision (une couleur par sprint).}
+\label{fig:pipeline}
+\end{figure}
+
+\begin{table}[H]
+\centering\small
+\begin{tabularx}{\linewidth}{lY}
+\toprule
+Sprint & Travail réalisé \\
+\midrule
+1 · Données & lecture des fichiers, contrôle qualité, filtrage, découpage par roulement, Kaplan-Meier, Weibull, B10, B50, L10 \\
+2 · Santé & 36 features, normalisation multi-conditions, détection du premier défaut, sélection des features, indicateur de santé \\
+3 · Modèles & B10 conditionnel, Wiener bayésien, SVR, GPR, forêt aléatoire, LSTM, CNN 1D, recherche des hyperparamètres \\
+4 · Évaluation & RMSE, MAE, score PHM, bootstrap, tests statistiques, données simulées, XAI, covariables, économie \\
+\bottomrule
+\end{tabularx}
+\caption[Travail réalisé dans chaque sprint]{Ce que chaque sprint a produit.}
+\label{tab:sprints}
+\end{table}
+
+\section{Prétraitement, features et normalisation}
+
+\textbf{Filtrage.} On enlève la dérive lente du signal, puis on applique un filtre passe-bande de Butterworth d'ordre 4 entre 10 Hz et 10 kHz, dans les deux sens pour ne pas décaler le signal. \emph{Pourquoi :} les chocs d'un défaut de roulement sont dans cette bande ; en dessous, c'est de la dérive, au-dessus on est trop près de la limite de mesure (12,8 kHz).
+
+\textbf{Features.} Sur chaque fichier et chaque axe, on calcule 18 indicateurs (tableau~\ref{tab:features}), soit 36 en tout. Les énergies de paquets d'ondelettes découpent le spectre en 8 bandes de 1,6 kHz et suivent l'énergie de chaque bande.
+
+\begin{table}[H]
+\centering\small
+\begin{tabularx}{\linewidth}{lY}
+\toprule
+Famille & Indicateurs (par axe) \\
+\midrule
+Temporels (8) & RMS, pic, crête à crête, kurtosis, asymétrie, facteurs de crête, de forme et d'impulsion \\
+Fréquentiels (2) & fréquence moyenne, entropie spectrale \\
+Temps-fréquence (8) & énergie des 8 sous-bandes d'une décomposition en paquets d'ondelettes (db4, niveau 3) \\
+\bottomrule
+\end{tabularx}
+\caption[Les 18 features par axe]{Les 18 features calculées sur chaque axe.}
+\label{tab:features}
+\end{table}
+
+\textbf{Normalisation multi-conditions.} Chaque feature $x$ est divisée par son niveau à l'état sain $\bar{x}_{\text{sain}}$ (moyenne des fichiers 31 à 150, après le rodage), puis on prend le logarithme :
+\begin{equation}
+\tilde{x}(t) = \ln\big(x(t) / \bar{x}_{\text{sain}}\big).
+\end{equation}
+\emph{Pourquoi :} 0 veut alors dire « comme à l'état sain », quelles que soient la charge et la vitesse ; les trois conditions deviennent comparables. On lisse ensuite par une moyenne glissante sur 1 min, qui n'utilise que le passé.
+
+\section{Fiabilité de la population}
+
+\textbf{Vraisemblance avec censure.} Les 6 roulements d'apprentissage sont des défaillances ($\delta_i = 1$), les 11 roulements de test sont censurés à leur âge de troncature ($\delta_i = 0$). La vraisemblance d'une loi de densité $f$ et de fiabilité $R$ s'écrit :
+\begin{equation}
+L(\theta) = \prod_{i=1}^{17} f(t_i)^{\delta_i}\, R(t_i)^{1-\delta_i}.
+\end{equation}
+Un roulement censuré compte par $R(t_i)$ : « il a tenu au moins jusqu'à $t_i$ ». On cherche les paramètres $\theta$ qui rendent les données les plus probables (maximum de vraisemblance, MV). Nous comparons quatre lois (exponentielle, Weibull, log-normale, log-logistique) avec l'AIC $= 2k - 2\ln L$ \cite{akaike1974}, et nous testons $\beta = 1$ par le test du rapport de vraisemblance.
+
+\textbf{Loi de Weibull et indicateurs.} Avec $R(t) = \exp\!\big(-(t/\eta)^{\beta}\big)$ \cite{benhmida2022} :
+\begin{equation}
+\text{MTTF} = \eta\,\Gamma(1 + 1/\beta), \qquad B_p = \eta\,\big(-\ln(1-p)\big)^{1/\beta},
+\end{equation}
+avec $p = 0{,}10$ pour le B10 et $p = 0{,}50$ pour le B50. Leurs intervalles de confiance sont obtenus par bootstrap \cite{efron1979} : on refait l'ajustement 1 000 fois en tirant les 17 roulements au hasard. La durée L10 des catalogues vaut $(C/P)^3$ millions de tours \cite{iso281}, avec $C = 4\,000$ N.
+
+\textbf{B10 conditionnel.} Pour un roulement encore sain d'âge $a$, c'est la durée $x$ qu'il tiendra encore avec 90 \% de chances : $R(a + x)/R(a) = 0{,}9$. C'est notre prédiction tant qu'aucun défaut n'est détecté.
+
+\textbf{Covariables.} Une covariable est une variable extérieure qui peut changer la durée de vie, ici la charge ou la vitesse. Le modèle de Weibull à temps accéléré (AFT) \cite{kalbfleisch2002} écrit $\ln \eta = a_0 + a_1\,z$ : chaque unité de la covariable $z$ multiplie la durée de vie par $e^{a_1}$.
+
+\section{Premier défaut et indicateur de santé}
+
+\textbf{Règle des 3 $\sigma$.} Pour chaque axe, le seuil vaut la moyenne plus 3 écarts-types du RMS lissé à l'état sain. On déclenche une alarme après 3 mesures de suite au-dessus du seuil, et on l'annule si le RMS repasse 5 min sous le seuil (transitoire). La règle n'utilise que le passé : elle marche en temps réel. L'instant de l'alarme confirmée est le FPT.
+
+\textbf{Sélection des features.} Sur la phase de dégradation des roulements d'apprentissage, chaque feature reçoit trois notes entre 0 et 1 \cite{coble2009} : la \emph{monotonie} (elle évolue toujours dans le même sens), la \emph{corrélation} de Spearman avec le temps (tendance régulière) et la \emph{pronosticabilité} (tous les roulements finissent à peu près à la même valeur). Le score est la moyenne des trois notes ; les 8 meilleures features sont les entrées des modèles d'apprentissage automatique.
+
+\textbf{Indicateur de santé.} Le HI est la moyenne des $k$ meilleures features ; on essaie $k = 1$ à 10 et on garde le meilleur score. Le seuil de défaillance $D$ est la valeur moyenne du HI à la fin de vie des roulements d'apprentissage.
+
+\section{Les méthodes de pronostic}
+
+\textbf{Passage d'une méthode à l'autre.} Toutes les méthodes reçoivent les mêmes données et prédisent la même chose : la RUL en minutes, à chaque instant après le FPT. On va du plus simple au plus riche (tableau~\ref{tab:methodes}) : d'abord la population (aucun capteur), puis un modèle stochastique qui suit le HI d'un seul roulement, puis l'apprentissage automatique qui combine 8 features, puis l'apprentissage profond qui lit une fenêtre de mesures successives.
+
+\begin{table}[H]
+\centering\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\linewidth}{lYYl}
+\toprule
+Méthode & Idée en une phrase & Pourquoi ce choix & Réglages testés \\
+\midrule
+B10 conditionnel & la population donne la durée que 90 \% des roulements de cet âge tiendront & seule réponse possible sans défaut détecté & aucun \\
+Wiener bayésien & le HI monte avec une pente aléatoire ; la RUL = temps pour atteindre $D$ & explicable, donne un intervalle & aucun \\
+SVR & régression à noyau qui ignore les petites erreurs & robuste avec peu de données & 24 combinaisons \\
+GPR & processus gaussien, donne aussi une incertitude & lisse, bon avec peu de points & 3 combinaisons \\
+Forêt aléatoire & moyenne de 300 arbres de décision & non linéaire, peu de réglages & 18 combinaisons \\
+LSTM & réseau récurrent qui lit les dernières mesures & capte la dynamique & 4 combinaisons \\
+CNN 1D & convolutions sur une fenêtre de mesures & rapide, motifs locaux & 4 combinaisons \\
+\bottomrule
+\end{tabularx}
+\caption[Les sept méthodes de pronostic]{Les sept méthodes de pronostic comparées.}
+\label{tab:methodes}
+\end{table}
+
+\textbf{Le processus de Wiener bayésien.} Après le FPT, le HI suit $X(t) = X(t_0) + \mu\,(t - t_0) + \sigma B(t - t_0)$, où $B$ est un mouvement brownien \cite{si2011,zhang2018}. La pente $\mu$ change d'un roulement à l'autre : on lui donne une loi \emph{a priori} $\mathcal{N}(\mu_0, s_0^2)$ apprise sur l'apprentissage, puis on la met à jour avec la montée observée du roulement suivi :
+\begin{equation}
+\mu_{\text{post}} = \frac{\mu_0/s_0^2 + \Delta X/\sigma^2}{1/s_0^2 + \Delta t/\sigma^2}.
+\end{equation}
+Au début on fait confiance à la population, puis de plus en plus au roulement lui-même. Le seuil $D$ est lui aussi incertain. En tirant 2 000 couples $(\mu, D)$, le temps de premier passage (loi inverse gaussienne) donne la RUL médiane et un intervalle de prédiction à 90 \%.
+
+\textbf{Apprentissage automatique et profond.} Entrées : les 8 features et le temps écoulé depuis le FPT. Cible : $\ln(1 + \text{RUL})$, pour que les erreurs proches de la fin de vie comptent plus. Chaque roulement d'apprentissage donne 100 exemples, pour peser autant que les autres.
+
+\textbf{Changement des paramètres.} Les hyperparamètres sont choisis par recherche sur grille avec une validation croisée « un roulement de côté » : on apprend sur 5 roulements d'apprentissage et on valide sur le 6\textsuperscript{e}, six fois. Le test ne sert jamais au réglage.
+
+\section{Critères de jugement, protocoles et tests}
+
+\textbf{Critères.} Sur toute la phase de dégradation, on calcule la RMSE et la MAE (en minutes) de chaque roulement, puis leur moyenne. Le challenge juge aussi une prédiction ponctuelle par son erreur relative et un score asymétrique :
+\begin{equation}
+\%Er = 100\,\frac{\text{RUL}_{\text{réelle}} - \text{RUL}_{\text{prédite}}}{\text{RUL}_{\text{réelle}}}, \qquad
+A = \begin{cases} e^{-\ln(0{,}5)\,\%Er/5} & \text{si } \%Er \le 0 \text{ (trop tard)}\\ e^{+\ln(0{,}5)\,\%Er/20} & \text{si } \%Er > 0 \text{ (trop tôt)} \end{cases}
+\end{equation}
+Prévoir 5 \% trop tard coûte autant que prévoir 20 \% trop tôt : une panne surprise est plus grave qu'un remplacement un peu précoce. Le \emph{score PHM} est la moyenne de $A$ à 25, 50 et 75 \% de la phase de dégradation de chaque roulement ; le \emph{score challenge} prend une seule prédiction, à l'instant de troncature. Pour le Wiener, on mesure aussi la \emph{couverture} : la part des vraies RUL qui tombent dans l'intervalle à 90 \%.
+
+\textbf{Différents types de tests.} Nous avons vérifié le travail de six façons (tableau~\ref{tab:tests}).
+
+\begin{table}[H]
+\centering\small
+\begin{tabularx}{\linewidth}{lY}
+\toprule
+Type de test & Question posée \\
+\midrule
+Tests unitaires (29 tests pytest) & chaque fonction donne-t-elle la réponse connue à la main ? \\
+Données simulées & la méthode retrouve-t-elle la vérité quand on la connaît ? \\
+Validation croisée « un roulement de côté » & les réglages sont-ils choisis sans regarder le test ? \\
+Test indépendant (11 roulements) & le modèle marche-t-il sur des roulements jamais vus ? \\
+Tests statistiques & les écarts entre méthodes sont-ils réels (Wilcoxon \cite{wilcoxon1945}, Friedman \cite{friedman1937}) ? \\
+Bootstrap & quelle est l'incertitude des indicateurs et des scores ? \\
+\bottomrule
+\end{tabularx}
+\caption[Les six types de tests]{Les six façons de tester le travail.}
+\label{tab:tests}
+\end{table}
+
+\section{Modèle économique}
+
+On compare plusieurs stratégies en rejouant la vie des 11 roulements de test. Un remplacement planifié coûte $C_p = 1$ unité (u), une panne coûte $C_c = 5$ u (urgence, arrêt, dégâts) et une fausse alarme coûte une inspection à 0,1 u. Pour la stratégie préventive, le coût moyen par heure d'un remplacement à l'âge $T$ est \cite{barlow1965} :
+\begin{equation}
+C(T) = \frac{C_p\,R(T) + C_c\,\big(1 - R(T)\big)}{\int_0^T R(u)\,du},
+\end{equation}
+et l'âge optimal $T^*$ minimise $C(T)$. Pour les stratégies prédictives, on déclenche le remplacement dès que la RUL prédite passe sous un seuil $s = 10$ min ; il a lieu après un délai d'intervention de 2 min. S'il arrive avant la panne, on paie $C_p$ ; sinon, on paie $C_c$.
+
+\chapconclusion
+La démarche couvre les six blocs de la surveillance industrielle, avec une règle simple : tout ce qui se règle l'est sur l'apprentissage, tout ce qui se juge l'est sur le test.

@@ -1,0 +1,44 @@
+\chapter*{Annexes}
+\addcontentsline{toc}{chapter}{Annexes}
+\frontmark{Annexes}
+
+\section*{Annexe A -- Paramètres et hypothèses}
+
+\begin{table}[H]
+\centering\small
+\begin{tabularx}{\linewidth}{lY}
+\toprule
+Élément & Valeur retenue \\
+\midrule
+État sain de référence & fichiers 31 à 150 (de 5 à 25 min) \\
+Lissage & moyenne glissante sur 6 mesures (1 min), passé seulement \\
+Premier défaut & 3 $\sigma$, 3 mesures consécutives, annulation après 5 min sous le seuil \\
+Entrées des modèles & 8 énergies de bandes d'ondelettes et le temps depuis le premier défaut \\
+Indicateur de santé & énergie de la bande 6,4--8,0 kHz (axe vertical), seuil $D = 3{,}34 \pm 0{,}63$ \\
+Wiener & $\mu_0 = 0{,}281$ /min, $s_0 = 0{,}276$ /min, $\sigma = 0{,}245$, 2 000 tirages \\
+SVR & $C = 1$, $\gamma = 0{,}1$, $\varepsilon = 0{,}05$ \\
+GPR & noyau RBF + bruit blanc, longueur de départ 1,0 \\
+Forêt aléatoire & 300 arbres, 50 \% des entrées par nœud, 5 exemples par feuille \\
+LSTM / CNN 1D & 32 unités, fenêtre de 6 mesures / 16 filtres, fenêtre de 12 mesures \\
+Économie & $C_p = 1$ u, $C_c = 5$ u, fausse alarme 0,1 u, délai 2 min, seuil 10 min \\
+Graine aléatoire & 42 (tous les résultats se refont à l'identique) \\
+\bottomrule
+\end{tabularx}
+\caption[Paramètres et hypothèses du projet]{Paramètres et hypothèses du projet.}
+\label{tab:parametres}
+\end{table}
+
+\section*{Annexe B -- Code, tests et bibliographie}
+
+\textbf{Organisation du code.} Le projet (Python, scikit-learn, lifelines, Keras) tient en quatre scripts, à lancer dans l'ordre :
+\begin{itemize}[nosep,leftmargin=1.6em]
+  \item \texttt{1\_extraire\_features.py} : des signaux bruts aux features ;
+  \item \texttt{2\_lancer\_pipeline.py} : sprints 2 à 4 (santé, modèles, évaluation) ;
+  \item \texttt{3\_figures\_rapport.py} : les figures du rapport ;
+  \item \texttt{4\_analyses\_complementaires.py} : vraisemblance, covariables, XAI, économie.
+\end{itemize}
+Le dossier \texttt{src/} contient un module par étape, \texttt{dashboard/} le tableau de bord (\texttt{streamlit run dashboard/app.py}) et \texttt{tests/} les 29 tests automatiques (\texttt{python -m pytest}).
+
+\textbf{Reproductibilité.} Chaque exécution enregistre la date, la durée et les versions des bibliothèques (\texttt{results/run\_info.json}) ; seuls les réseaux de neurones varient un peu d'un PC à l'autre.
+
+\textbf{Bibliographie.} Les références, au format IEEE, sont dans \texttt{references.bib}, qui s'importe directement dans Zotero. Le connecteur Zotero du navigateur ajoute une référence depuis Google Scholar ou IEEE Xplore en un clic ; ses modules pour Word et Google Docs citent au même format.

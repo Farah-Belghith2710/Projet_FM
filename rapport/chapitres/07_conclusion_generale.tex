@@ -1,0 +1,15 @@
+\chapter*{Conclusion générale}
+\addcontentsline{toc}{chapter}{Conclusion générale}
+\frontmark{Conclusion générale}
+
+Ce projet a suivi toute la démarche de la sûreté de fonctionnement sur des roulements réels, du fichier de vibration jusqu'à la décision de maintenance, en quatre sprints.
+
+La \textbf{fiabilité de la population}, calculée en tenant compte des roulements censurés, suit une loi de Weibull de forme $\beta = 1{,}85$ : un roulement sur dix casse avant 125 min (B10) et la moitié avant 346 min (B50). Avec seulement 6 défaillances, ces valeurs restent incertaines, comme l'ont confirmé le bootstrap et les données simulées. La charge, ajoutée comme covariable, raccourcit nettement la durée de vie.
+
+La \textbf{surveillance vibratoire} détecte le premier défaut en médiane 7,8 min avant la panne, avec une règle simple qui fonctionne en temps réel. Après ce défaut, toutes les méthodes fondées sur les capteurs prédisent bien mieux que la fiabilité seule. Le processus de Wiener bayésien est le plus précis (RMSE de 16,4 min) et le plus simple à expliquer ; le LSTM est le plus prudent. Avec 11 roulements de test, les écarts entre ces méthodes ne sont toutefois pas significatifs.
+
+Sur le plan \textbf{économique}, rejouer la vie des roulements de test montre qu'une maintenance prédictive fondée sur le Wiener réduit le coût par heure de 47 \% par rapport au correctif, et fait mieux que le remplacement préventif à l'âge optimal. La limite principale est physique : quand le défaut apparaît moins de 2 min avant la casse, aucune méthode ne laisse le temps d'intervenir.
+
+Les tests sur données simulées ont aussi montré d'où vient la principale faiblesse : le seuil de défaillance, appris sur trop peu de roulements, rend les intervalles d'incertitude trop étroits. Les prochaines étapes sont donc claires : plus d'essais, un seuil appris par condition, des intervalles calibrés, et d'autres variables comme la température.
+
+Au-delà des chiffres, ce travail nous a appris qu'un bon pronostic ne vaut que par la décision qu'il permet, et qu'il faut toujours tester une méthode là où l'on connaît la réponse avant de lui faire confiance.

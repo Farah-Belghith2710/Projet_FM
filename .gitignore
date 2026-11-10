@@ -1,0 +1,7 @@
+# données brutes FEMTO (~2 Go) : à télécharger, voir README
+data/raw/
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.ipynb_checkpoints/

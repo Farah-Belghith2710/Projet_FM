@@ -1,0 +1,21 @@
+\chapter*{Introduction générale}
+\addcontentsline{toc}{chapter}{Introduction générale}
+\frontmark{Introduction générale}
+
+Les roulements sont partout : moteurs, pompes, ventilateurs, réducteurs. Quand un roulement casse, la machine s'arrête, souvent sans prévenir, et la panne peut abîmer d'autres pièces. À l'inverse, le changer trop tôt revient à jeter une pièce encore bonne. Pour trouver le bon moment, il faut savoir estimer, pour chaque roulement, sa \textbf{durée de vie résiduelle} (RUL) : le temps qu'il lui reste avant la panne.
+
+Ce projet, réalisé dans le module « Sûreté de fonctionnement et maintenance », traite cette question sur les données réelles du banc PRONOSTIA de l'institut FEMTO-ST, utilisées pour le challenge IEEE PHM 2012 \cite{nectoux2012,phm2012challenge} : 17 roulements usés jusqu'à la casse sous trois conditions de charge et de vitesse.
+
+\begin{encadre}
+\textbf{Problématique.} À partir des vibrations d'un roulement, peut-on prédire sa durée de vie résiduelle, avec quelle précision, et quelle famille de méthodes marche le mieux : la fiabilité de la population, un modèle stochastique, l'apprentissage automatique classique ou l'apprentissage profond ? Et que gagne-t-on, en coût de maintenance, à utiliser ces prédictions ?
+\end{encadre}
+
+Nous avons travaillé en quatre sprints, du signal brut jusqu'à la décision de maintenance :
+\begin{enumerate}
+  \item \textbf{données et fiabilité} : lecture et contrôle des 24 889 fichiers, filtrage, lois de durée de vie, B10, B50 ;
+  \item \textbf{santé du roulement} : indicateurs de vibration, détection du premier défaut, indicateur de santé ;
+  \item \textbf{modèles} : sept méthodes de prédiction de la RUL, réglées sans jamais regarder les roulements de test ;
+  \item \textbf{évaluation et décision} : critères de jugement, tests, explicabilité et analyse économique.
+\end{enumerate}
+
+Le rapport suit cette démarche. Le chapitre 1 présente le cadre industriel, l'état de l'art et les données. Le chapitre 2 décrit la méthodologie complète, de A à Z. Le chapitre 3 donne les résultats et compare les méthodes. Le chapitre 4 transforme les prédictions en décisions de maintenance, chiffre le gain économique et propose des perspectives. Tous les résultats sont aussi présentés dans un tableau de bord interactif.

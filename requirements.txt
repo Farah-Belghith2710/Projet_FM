@@ -1,0 +1,18 @@
+# --- Dashboard seulement (les résultats sont déjà calculés dans results/) ---
+streamlit>=1.50
+plotly>=5.20
+pandas>=2.0
+numpy>=1.24
+
+# --- Pour relancer les calculs (étapes 1, 2 et 3) ---
+scipy>=1.10
+scikit-learn>=1.3
+PyWavelets>=1.4
+lifelines>=0.27
+matplotlib>=3.7
+
+# --- Deep learning (LSTM, CNN 1D) : optionnel, l'étape 2 tourne sans ---
+tensorflow>=2.15
+
+# --- Tests ---
+pytest>=7

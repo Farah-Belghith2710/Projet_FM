@@ -1,0 +1,25 @@
+# Thème du dashboard : mode sombre, fond noir légèrement bleuté et accents bleus
+[theme]
+base = "dark"
+primaryColor = "#3D8BFD"            # bleu : boutons, curseurs, cases cochées
+backgroundColor = "#0A0D13"         # noir bleuté
+secondaryBackgroundColor = "#131A26"
+textColor = "#E6EBF3"
+linkColor = "#6EA8FF"
+borderColor = "#1F2A3B"
+showWidgetBorder = true
+baseRadius = "0.7rem"
+font = "sans-serif"
+headingFont = "serif"
+dataframeHeaderBackgroundColor = "#131A26"
+
+[theme.sidebar]
+backgroundColor = "#070A0F"
+secondaryBackgroundColor = "#111826"
+borderColor = "#1A2333"
+
+[browser]
+gatherUsageStats = false
+
+[client]
+toolbarMode = "viewer"   # cache le bouton « Deploy »

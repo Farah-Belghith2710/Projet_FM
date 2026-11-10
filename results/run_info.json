@@ -1,0 +1,20 @@
+{
+ "date": "2026-11-09T20:06:54",
+ "duree_s": 393.6,
+ "mode": "complet",
+ "python": "3.10.5",
+ "systeme": "Windows 10",
+ "bibliotheques": {
+  "numpy": "2.2.6",
+  "pandas": "2.3.3",
+  "scipy": "1.15.3",
+  "scikit-learn": "1.7.2",
+  "lifelines": "0.30.0",
+  "PyWavelets": "1.8.0",
+  "keras": "3.12.4",
+  "streamlit": "1.65.0",
+  "plotly": "7.1.0",
+  "tensorflow": "2.21.0"
+ },
+ "graine": 42
+}
