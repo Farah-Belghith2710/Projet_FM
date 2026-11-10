@@ -1,9 +1,9 @@
 # Étude comparative de pronostic de défaillance de roulements
 
 **Module :** Sûreté de fonctionnement et maintenance · **Encadrant :** M. Fayçal Ben Hmida · ENSIT, GMAM 3
-**Équipe :** Farah BELGHITH, _à compléter_
+**Équipe :** Farah BELGHITH,Rami Kammoun, Selim Najjar
 **Données :** FEMTO-ST / PRONOSTIA, challenge IEEE PHM 2012 (17 roulements, 3 conditions opératoires)
-**Livrables :** pipeline Python en 4 sprints, 23 figures, dashboard interactif en 7 pages (Streamlit), rapport PDF de 30 pages (`rapport/`, sources LaTeX pour Overleaf)
+**Livrables :** pipeline Python en 4 sprints, 23 figures, dashboard interactif en 7 pages (Streamlit)
 
 **Question étudiée :** à partir des vibrations d'un roulement, peut-on prédire sa durée de vie résiduelle (RUL, *Remaining Useful Life*) ? Et quelle famille de modèles marche le mieux : fiabilité de la population, modèle stochastique, machine learning classique ou deep learning ?
 
