@@ -254,12 +254,6 @@ Le dashboard est en thème sombre (noir et bleu) : chaque page a sa nuance de bl
 | fig22_economie | âge optimal T* et coût par heure de chaque stratégie | 4 |
 | fig23_seuil_decision | effet du seuil de décision sur le coût | 4 |
 
-## 6. Rapport (`rapport/`)
-
-- `Rapport_Pronostic_Roulements.pdf` : le rapport final (30 pages, en français), sur le modèle des rapports de projet de l'ENSIT.
-- `main.tex` et `chapitres/` : les sources LaTeX. Pour les modifier sur Overleaf, importer le fichier `Rapport_Overleaf.zip` (Nouveau projet > Importer un projet) ; le compilateur XeLaTeX est choisi par `.latexmkrc` (sinon : Menu > Compilateur > XeLaTeX ; pdfLaTeX marche aussi). Les noms de l'équipe se changent dans `chapitres/00_titre.tex`. Le mode d'emploi est dans `rapport/LISEZMOI.md`.
-- `references.bib` : les références au format IEEE, à importer dans Zotero (Fichier > Importer).
-
 ## Références
 
 - P. Nectoux, R. Gouriveau, K. Medjaher, E. Ramasso, B. Chebel-Morello, N. Zerhouni, C. Varnier, *PRONOSTIA: An experimental platform for bearings accelerated degradation tests*, IEEE International Conference on Prognostics and Health Management (PHM), 2012
